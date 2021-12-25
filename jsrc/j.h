@@ -442,11 +442,9 @@ extern unsigned int __cdecl _clearfp (void);
 #endif
 #endif
 
-#if !SY_64 && defined(__GNUC__)
-#if !__has_builtin(__builtin_add_overflow)
+#if !SY_64 && defined(__GNUC__) && !defined(__clang__)
+#if __GNUC__ < 5
 #define __builtin_add_overflow(a,b,c) ({int64_t s=(int64_t)(a)+(int64_t)(b); *(c)=(long)s; (s<INT_MIN||s>INT_MAX);})
-#endif
-#if !__has_builtin(__builtin_sub_overflow)
 #define __builtin_sub_overflow(a,b,c) ({int64_t s=(int64_t)(a)-(int64_t)(b); *(c)=(long)s; (s<INT_MIN||s>INT_MAX);})
 #endif
 #endif
@@ -1100,7 +1098,7 @@ if(likely(!((I)jtinplace&JTWILLBEOPENED)))z=EPILOGNORET(z); RETF(z); \
 // Note: assigns name before assigning the components of the array, so the components had better not depend on name, i. e. no GATV(z,BOX,AN(z),AR(z),AS(z))
 #define GATVS(name,type,atoms,rank,shaape,size,shapecopier,erraction) \
 { I bytes = ALLOBYTES(atoms,rank,size,(type)&LAST0,(type)&NAME); \
- if(SY_64){ASSERT((((I)(atoms)>>(TOOMANYATOMSX-RANKTX))|(I)(rank))<=RMAX,EVLIMIT)} \
+ if(SY_64){ASSERT((((I)(atoms)>>SY_64?(TOOMANYATOMSX-RANKTX):0)|(I)(rank))<=RMAX,EVLIMIT)}  \
  else{ASSERT(((I)bytes>(I)(atoms)&&(I)(atoms)>=(I)0)&&!((rank)&~RMAX),EVLIMIT)} \
  HISTOCALL \
  name = jtgafv(jt, bytes);   \
